@@ -2,20 +2,21 @@ import React, { useState } from 'react';
 import { StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Text, View } from '../components/Themed';
+import { auth } from './firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 const Giris = () => {
     const navigation = useNavigation<any>();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    // Burada login işlemleri gerçekleştirilebilir
-    console.log('Email:', email);
-    console.log('Password:', password);
-    // Örneğin: API çağrısı veya doğrulama işlemi
-
-    // Başarılı giriş sonrası bir sonraki sayfaya yönlendirme örneği
-    navigation.navigate("(tabs)");
+  const handleLogin = async () => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      navigation.navigate("(tabs)");
+    } catch (error: any) {
+      alert(error.message);
+    }
   };
   return (
   <View style={styles.container}>

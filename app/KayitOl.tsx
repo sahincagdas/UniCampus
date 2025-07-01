@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import {  StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Text, View } from '../components/Themed';
+import { auth, db } from './firebase';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { setDoc, doc } from 'firebase/firestore';
 
 const KayitOl = () => {
     const navigation = useNavigation<any>();
@@ -10,16 +13,20 @@ const KayitOl = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
   
-    const handleRegister = () => {
-      // Burada kayıt işlemleri gerçekleştirilebilir
-      console.log('Ad:', firstName);
-      console.log('Soyad:', lastName);
-      console.log('Email:', email);
-      console.log('Şifre:', password);
-      // Örneğin: API çağrısı veya kullanıcı oluşturma işlemi
-  
-      // Başarılı kayıt sonrası bir sonraki sayfaya yönlendirme örneği
-      navigation.navigate('Giris');
+    const handleRegister = async () => {
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        // Firestore'a ad ve soyad bilgisini kaydet
+        await setDoc(doc(db, 'users', user.uid), {
+          firstName,
+          lastName,
+          email
+        });
+        navigation.navigate('Giris');
+      } catch (error: any) {
+        alert(error.message);
+      }
     };
   
     return (
